@@ -1,32 +1,42 @@
 {% set name = "zope.proxy" %}
-{% set version = "5.0.0" %}
+{% set version = "7.0" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 6fa44c97a412b4dc51e2f5fd4dc73c5bd499d35280f88cd2bcd26f8ae1e4577b
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name|replace(".", "_") }}-{{ version }}.tar.gz
+  sha256: 19cddee4b376ae9791fd6ddb491e861e3a7317a97b49a946b2e3c3f78254564c
 
 build:
   number: 0
-  script: {{ PYTHON }} -m pip install . -vv
+  skip: True  # [py<39]
+  script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
 requirements:
   build:
-    # This has a C extension
+    - {{ stdlib('c') }}
     - {{ compiler('c') }}
   host:
-    - python
     - pip
+    - python
+    - setuptools
+    - wheel
   run:
     - python
+    - setuptools
     - zope.interface
 
 test:
   imports:
     - zope.proxy
+  requires:
+    - pip
+    - pytest
+  commands:
+    - pip check
+    - pytest --pyargs zope.proxy
 
 about:
   home: https://github.com/zopefoundation/zope.proxy
@@ -43,7 +53,7 @@ about:
     like lie about its own __class__ that are difficult in pure Python (and
     were completely impossible before metaclasses). It also proxies all the
     internal slots (such as __int__/__str__/__add__).
-  doc_url: https://zopeproxy.readthedocs.io/en/latest/
+  doc_url: https://zopeproxy.readthedocs.io
   dev_url: https://github.com/zopefoundation/zope.proxy
 
 extra:

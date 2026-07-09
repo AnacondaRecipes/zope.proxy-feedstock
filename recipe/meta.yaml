@@ -25,7 +25,6 @@ requirements:
     - wheel
   run:
     - python
-    - setuptools
     - zope.interface
 
 test:
